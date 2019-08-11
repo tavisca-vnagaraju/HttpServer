@@ -31,24 +31,20 @@ namespace HttpServer
                 {
                     var httpListenerContext = _requestsQueue.GetRequest();
                     if (httpListenerContext == null)
+                    {
                         continue;
+                    }
                     Dispatcher dispatcher = new Dispatcher(httpListenerContext, _domainPath);
-                    dispatcher.ParseUrl();
-                    if(dispatcher.GetHttpMethod() == "GET")
+                    dispatcher.ParseRequest();
+                    if (dispatcher.UrlAbsolutePath().Contains("favicon"))
                     {
-                        FileHandler fileHandler = new FileHandler();
-                        if (dispatcher.GetFilePath().Contains("favicon"))
-                            continue;
-                        _bytes = fileHandler.GetFileBytes(dispatcher.GetFilePath());
+                        continue;
                     }
-                    else if(dispatcher.GetHttpMethod() == "POST")
-                    {
-                        PostHandler postHandler = new PostHandler(dispatcher.GetFilePath());
-                        _bytes = postHandler.GetBytes(dispatcher.GetBody());
-                    }
+                    HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactory();
+                    IHttpHandler httpHandler = httpHandlerFactory.GetHttpHandler(dispatcher.GetHttpMethod());
+                    _bytes = httpHandler.GetBytes(dispatcher);
                     Response response = new Response(httpListenerContext);
                     response.WriteResponse(_bytes);
-
                 }
             }
         }

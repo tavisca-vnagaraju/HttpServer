@@ -2,13 +2,13 @@
 
 namespace HttpServer
 {
-    public class FileHandler
+    public class FileHandler:IHttpHandler
     {
-        public byte[] GetFileBytes(string filePath)
+        public byte[] GetBytes(Dispatcher dispatcher)
         {
             try
             {
-                return File.ReadAllBytes(filePath);
+                return File.ReadAllBytes(dispatcher.UrlAbsolutePath());
             }
             catch(FileNotFoundException e)
             {

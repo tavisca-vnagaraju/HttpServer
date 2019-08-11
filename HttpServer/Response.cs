@@ -11,7 +11,6 @@ namespace HttpServer
         {
             _httpListenerContext = httpListenerContext;
         }
-
         public void WriteResponse(byte[] bytes)
         {
             var response = _httpListenerContext.Response;
@@ -24,5 +23,6 @@ namespace HttpServer
             output.Close();
         }
     }
+
 }
      

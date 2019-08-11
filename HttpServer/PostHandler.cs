@@ -1,48 +1,35 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace HttpServer
 {
-    public class PostHandler
+    public class PostHandler: IHttpHandler
     {
-        private JObject _jObject;
+        private JObject resultJsonObject;
         private byte[] _bytes;
-        private string _path;
 
-        public PostHandler(string path)
+        public byte[] GetBytes(Dispatcher dispatcher)
         {
-            _path = path;
-        }
-
-        public byte[] GetBytes(JObject jObject)
-        {
-            if(_path == "/IsLeapYear")
+            if (dispatcher.UrlAbsolutePath() == "/IsLeapYear")
             {
-                _jObject = new JObject();
+                resultJsonObject = new JObject();
+                var jObject = dispatcher.GetBody();
                 var year = jObject["year"];
                 LeapYear leapYear = new LeapYear();
                 var isLeapYear = leapYear.IsLeapYear(int.Parse(year.ToString()));
-                _jObject["isLeapYear"] = isLeapYear;
-                _bytes = ObjectToByteArray(_jObject.ToString());
+                resultJsonObject["isLeapYear"] = isLeapYear;
+                resultJsonObject["year"] = year;
+
+                var jsonString = JsonConvert.SerializeObject(resultJsonObject);
+                _bytes = Encoding.ASCII.GetBytes(jsonString);
             }
             else
             {
-                return File.ReadAllBytes("NotFound.html");
+                _bytes = File.ReadAllBytes("NotFound.html");
             }
             return _bytes;
-        }
-        public byte[] ObjectToByteArray(object objectName)
-        {
-            if (objectName == null)
-                return null;
-            BinaryFormatter binaryFormatter = new BinaryFormatter();
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                binaryFormatter.Serialize(memoryStream, objectName);
-                return memoryStream.ToArray();
-            }
         }
     }
 }

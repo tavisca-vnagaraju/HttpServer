@@ -21,7 +21,7 @@ namespace HttpServer
             _httpListenerContext = httpListenerContext;
             _domainPath = domainPath;
         }
-        public void ParseUrl()
+        public void ParseRequest()
         {
             _domainUrl = _httpListenerContext.Request.Url.Authority;
             _method = _httpListenerContext.Request.HttpMethod;
@@ -49,7 +49,7 @@ namespace HttpServer
                 }
             }
         }
-        public string GetFilePath()
+        public string UrlAbsolutePath()
         {
             return _filePath;
         }
