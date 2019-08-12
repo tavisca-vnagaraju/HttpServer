@@ -12,22 +12,24 @@ namespace HttpServer
 
         public byte[] GetBytes(Dispatcher dispatcher)
         {
-            if (dispatcher.UrlAbsolutePath() == "/IsLeapYear")
+            try
+            {
+                ApiCallFactory apiCallFactory = new ApiCallFactory();
+                var path = dispatcher.UrlAbsolutePath();
+                IApiCall apiCall = apiCallFactory.GetApi(path);
+                resultJsonObject = apiCall.GetResult(dispatcher.GetBody());
+            }
+            catch(ApiNotFoundException e)
             {
                 resultJsonObject = new JObject();
-                var jObject = dispatcher.GetBody();
-                var year = jObject["year"];
-                LeapYear leapYear = new LeapYear();
-                var isLeapYear = leapYear.IsLeapYear(int.Parse(year.ToString()));
-                resultJsonObject["isLeapYear"] = isLeapYear;
-                resultJsonObject["year"] = year;
-
+                dispatcher.GetContext().Response.StatusCode = 404;
+                resultJsonObject["statusCode"] = 404;
+                resultJsonObject["message"] = "Api Not Found";
+            }
+            finally
+            {
                 var jsonString = JsonConvert.SerializeObject(resultJsonObject);
                 _bytes = Encoding.ASCII.GetBytes(jsonString);
-            }
-            else
-            {
-                _bytes = File.ReadAllBytes("NotFound.html");
             }
             return _bytes;
         }

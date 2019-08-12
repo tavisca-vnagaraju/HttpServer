@@ -11,8 +11,9 @@ namespace HttpServer
         { 
             _domainPath = new DomainPath();
             _requestsQueue = new RequestsQueue();
-            _domainPath.MapPathToDomain(8080,"WebPages");
-            _domainPath.MapPathToDomain(4000, "MyProject");
+            _domainPath.MapPathToDomain(8080,"WebPages","GET");
+            _domainPath.MapPathToDomain(4000, "MyProject","GET");
+            _domainPath.MapPathToDomain(4000, "/IsLeapYear","POST");
             var listen = new Thread(Listen);
             var response = new Thread(GetContext);
             listen.Start();
@@ -36,10 +37,10 @@ namespace HttpServer
                     }
                     Dispatcher dispatcher = new Dispatcher(httpListenerContext, _domainPath);
                     dispatcher.ParseRequest();
-                    if (dispatcher.UrlAbsolutePath().Contains("favicon"))
-                    {
-                        continue;
-                    }
+                    //if (dispatcher.UrlAbsolutePath().Contains("favicon"))
+                    //{
+                    //    continue;
+                    //}
                     HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactory();
                     IHttpHandler httpHandler = httpHandlerFactory.GetHttpHandler(dispatcher.GetHttpMethod());
                     _bytes = httpHandler.GetBytes(dispatcher);

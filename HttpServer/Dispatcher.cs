@@ -32,21 +32,26 @@ namespace HttpServer
                 {
                     absoluteFilePath = "/index.html";
                 }
-                _filePath = _domainPath.GetPathByDomain(_domainUrl+"/") + absoluteFilePath;
+                _filePath = _domainPath.GetPathByDomain(_domainUrl+"/","GET") + absoluteFilePath;
             }
-            if("POST" == _method)
+            else if("POST" == _method)
             {
-                _filePath = _httpListenerContext.Request.Url.AbsolutePath;
-                var hasBody = _httpListenerContext.Request.HasEntityBody;
-                if (hasBody)
+                var requestedFilePath = _httpListenerContext.Request.Url.AbsolutePath;
+                var existingPath = _domainPath.GetPathByDomain(_domainUrl + "/","POST");
+                if(requestedFilePath == existingPath || requestedFilePath == existingPath+"/")
                 {
-                    var bodyStream = _httpListenerContext.Request.InputStream;
-                    StreamReader streamReader = new StreamReader(bodyStream);
+                    var hasBody = _httpListenerContext.Request.HasEntityBody;
+                    _filePath = existingPath;
+                    if (hasBody)
+                    {
+                        var bodyStream = _httpListenerContext.Request.InputStream;
+                        StreamReader streamReader = new StreamReader(bodyStream);
 
-                    var text = streamReader.ReadToEnd();
-                    _jsonBody = JObject.Parse(text);
-
+                        var text = streamReader.ReadToEnd();
+                        _jsonBody = JObject.Parse(text);
+                    }
                 }
+
             }
         }
         public string UrlAbsolutePath()
@@ -60,6 +65,10 @@ namespace HttpServer
         public JObject GetBody()
         {
             return _jsonBody;
+        }
+        public HttpListenerContext GetContext()
+        {
+            return _httpListenerContext;
         }
     }
 }
