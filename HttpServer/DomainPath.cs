@@ -45,7 +45,6 @@ namespace HttpServer
                     return _postDomainPath[domain];
                 }
             }
-            //throw new ApiNotFoundException();
             return null;
         }
         public Dictionary<string, string> GetAllPathsAndDomains()

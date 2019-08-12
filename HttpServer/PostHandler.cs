@@ -18,13 +18,18 @@ namespace HttpServer
                 var path = dispatcher.UrlAbsolutePath();
                 IApiCall apiCall = apiCallFactory.GetApi(path);
                 resultJsonObject = apiCall.GetResult(dispatcher.GetBody());
-                var jsonString = JsonConvert.SerializeObject(resultJsonObject);
-                _bytes = Encoding.ASCII.GetBytes(jsonString);
             }
             catch(ApiNotFoundException e)
             {
+                resultJsonObject = new JObject();
                 dispatcher.GetContext().Response.StatusCode = 404;
-                _bytes = File.ReadAllBytes("NotFound.html");
+                resultJsonObject["statusCode"] = 404;
+                resultJsonObject["message"] = "Api Not Found";
+            }
+            finally
+            {
+                var jsonString = JsonConvert.SerializeObject(resultJsonObject);
+                _bytes = Encoding.ASCII.GetBytes(jsonString);
             }
             return _bytes;
         }
