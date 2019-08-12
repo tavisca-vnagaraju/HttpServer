@@ -7,6 +7,7 @@
             switch (apiName)
             {
                 case "/IsLeapYear":
+                case "/IsLeapYear/":
                     return new LeapYear();
                 default:
                     throw new ApiNotFoundException();

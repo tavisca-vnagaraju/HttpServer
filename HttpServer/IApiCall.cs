@@ -7,4 +7,3 @@ namespace HttpServer
         JObject GetResult(JObject jObject);
     }
 }
-     

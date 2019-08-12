@@ -15,13 +15,15 @@ namespace HttpServer
             try
             {
                 ApiCallFactory apiCallFactory = new ApiCallFactory();
-                IApiCall apiCall = apiCallFactory.GetApi(dispatcher.UrlAbsolutePath());
+                var path = dispatcher.UrlAbsolutePath();
+                IApiCall apiCall = apiCallFactory.GetApi(path);
                 resultJsonObject = apiCall.GetResult(dispatcher.GetBody());
                 var jsonString = JsonConvert.SerializeObject(resultJsonObject);
                 _bytes = Encoding.ASCII.GetBytes(jsonString);
             }
             catch(ApiNotFoundException e)
             {
+                dispatcher.GetContext().Response.StatusCode = 404;
                 _bytes = File.ReadAllBytes("NotFound.html");
             }
             return _bytes;
